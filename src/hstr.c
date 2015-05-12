@@ -44,10 +44,10 @@
 #define CMDLINE_LNG 2048
 #define HOSTNAME_BUFFER 128
 
-#define Y_OFFSET_PROMPT 0
+#define Y_OFFSET_PROMPT 3
 #define Y_OFFSET_HELP 1
-#define Y_OFFSET_HISTORY 2
-#define Y_OFFSET_ITEMS 3
+#define Y_OFFSET_HISTORY 0
+#define Y_OFFSET_ITEMS 4
 
 #define PG_JUMP_SIZE 10
 
@@ -337,8 +337,8 @@ int print_prompt(Hstr *hstr)
         char *hostname=malloc(HOSTNAME_BUFFER);
         user=(user?user:"me");
         get_hostname(HOSTNAME_BUFFER, hostname);
-        mvprintw(Y_OFFSET_PROMPT, xoffset, "%s@%s$ ", user, hostname);
-        promptLength=strlen(user)+1+strlen(hostname)+1+1;
+        mvprintw(Y_OFFSET_PROMPT, xoffset, ">> [%s]@[%s] ", user, hostname);
+        promptLength=3+strlen(user)+1+strlen(hostname)+1+4;
         free(hostname);
     }
 
@@ -829,7 +829,7 @@ void loop_to_select(Hstr *hstr)
 
     bool done=FALSE, skip=TRUE, executeResult=FALSE, lowercase=TRUE, printDefaultLabel=FALSE, fixCommand=FALSE;
     int basex=print_prompt(hstr);
-    int x=basex, y=0, c, cursorX=0, cursorY=0, maxHistoryItems, deletedOccurences;
+    int x=basex, y=Y_OFFSET_PROMPT, c, cursorX=0, cursorY=0, maxHistoryItems, deletedOccurences;
     int width=getmaxx(stdscr);
     int selectionCursorPosition=SELECTION_CURSOR_IN_PROMPT;
     int previousSelectionCursorPosition=SELECTION_CURSOR_IN_PROMPT;
@@ -866,10 +866,18 @@ void loop_to_select(Hstr *hstr)
 
         switch (c) {
         case KEY_HOME:
-            // avoids printing of wild chars in search prompt
+            // selects first entry in list
+            previousSelectionCursorPosition=selectionCursorPosition;
+            selectionCursorPosition=0;
+            highlight_selection(selectionCursorPosition, previousSelectionCursorPosition, pattern, hstr);
+            move(y, basex+strlen(pattern));
             break;
         case KEY_END:
-            // avoids printing of wild chars in search prompt
+            // selects first entry in list
+            previousSelectionCursorPosition=selectionCursorPosition;
+            selectionCursorPosition=hstr->selectionSize-1;
+            highlight_selection(selectionCursorPosition, previousSelectionCursorPosition, pattern, hstr);
+            move(y, basex+strlen(pattern));
             break;
         case KEY_DC: // DEL
             if(selectionCursorPosition!=SELECTION_CURSOR_IN_PROMPT) {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -vrf ../.git ../.settings ../Debug ../Release ../.cproject ../.project ../.gitignore
+rm -vrf ../.settings ../Debug ../Release ../.cproject ../.project
 
 rm -vf *.*~ ../*.*~ ../src/*.*~
 rm -rvf ../atom5te.cache
